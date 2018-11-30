@@ -1,6 +1,6 @@
-package service;
+package JGSSSecureAssociation;
 
-
+import client.*;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -37,10 +37,13 @@ public class JGSSSecureAssociation {
     public GSSContext init(final InputStream is,
                 final OutputStream os,
                 final boolean mutualAuthentication,
-                final boolean confienciality){
+                final boolean confienciality) throws GSSException{
+        context.requestMutualAuth(mutualAuthentication);
+        context.requestConf(confienciality);
+        context.requestInteg(true);
+        dos = new DataOutputStream(os);
+        dis = new DataInputStream(is);
         try{
-            final DataOutputStream dos = new DataOutputStream(os);
-            final DataInputStream dis = new DataInputStream(is);
             // Do the context eastablishment loop
             for (byte[] inToken = new byte[0]; !context.isEstablished();) {
 
@@ -106,9 +109,9 @@ public class JGSSSecureAssociation {
     
     public boolean send(final String message, final boolean confidenciality){
         try {
+            context.requestConf(confidenciality);
             final byte[] messageBytes = message.getBytes();
             final MessageProp prop = new MessageProp(0, true);
-            
             byte[] token;
             token = context.wrap(messageBytes, 0, messageBytes.length, prop);
             System.out.println("  * Will send wrap token of size " + token.length);
@@ -122,6 +125,8 @@ public class JGSSSecureAssociation {
             context.verifyMIC(token, 0, token.length,
                 messageBytes, 0, messageBytes.length,
                 prop);
+            dis.close();
+            dos.close();
             return true;
         } catch (GSSException ex) {
             Logger.getLogger(JGSSSecureAssociation.class.getName()).log(Level.SEVERE, null, ex);
@@ -129,6 +134,13 @@ public class JGSSSecureAssociation {
         } catch (IOException ex) {
             Logger.getLogger(JGSSSecureAssociation.class.getName()).log(Level.SEVERE, null, ex);
             return false;
+        } finally {
+            try {
+                dis.close();
+                dos.close();
+            } catch (IOException ex) {
+                Logger.getLogger(JGSSSecureAssociation.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     
@@ -159,6 +171,13 @@ public class JGSSSecureAssociation {
             context.dispose();
         } catch (GSSException|IOException e) {
             return null;
+        } finally {
+            try {
+                dis.close();
+                dos.close();
+            } catch (IOException ex) {
+                Logger.getLogger(JGSSSecureAssociation.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return str;
     }

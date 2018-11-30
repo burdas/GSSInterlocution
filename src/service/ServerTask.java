@@ -45,6 +45,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import JGSSSecureAssociation.JGSSSecureAssociation;
 
 /**
  * A sample server application that uses JGSS to do mutual authentication with

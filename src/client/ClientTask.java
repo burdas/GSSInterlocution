@@ -50,6 +50,7 @@ import java.security.PrivilegedExceptionAction;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import JGSSSecureAssociation.JGSSSecureAssociation;
 
 /**
  * A sample client application that uses JGSS to do mutual authentication with
