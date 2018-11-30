@@ -1,0 +1,41 @@
+//
+// Cláusula con permisos necesarios para código de la clase ServiceLogin 
+//
+grant /* codeBase "FILE:${user.dir}/dist/dossierbox.jar" */ {
+
+  permission javax.security.auth.AuthPermission "createLoginContext.DossierBox";
+  permission javax.security.auth.AuthPermission "doAsPrivileged";
+
+  //
+  // Permisos necesarios para introducir confidencialmente
+  // una contraseña por consola (TextCallbackHandler lanza
+  // una excepción de control de acceso sin estos permisos)
+  //
+  permission java.lang.RuntimePermission "writeFileDescriptor";
+  permission java.lang.RuntimePermission "readFileDescriptor";
+
+};
+
+//
+// Cláusula con permisos necesarios para código del servicio (clases
+// DossierBox y ServiceTask), asignados al administrador de la aplicación
+//
+grant /* codeBase "FILE:${user.dir}/dist/dossierbox.jar" */
+      Principal javax.security.auth.kerberos.KerberosPrincipal 
+      "dossierbox@LABOPROGSEGURA.UNAVARRA.ES" {
+
+  //
+  // Permiso para escuchar peticiones entrantes por el puerto 3200.
+  // Permiso para aceptar conexiones a partir del puerto 1024.
+  //
+  permission java.net.SocketPermission "*:3200",  "listen";
+  permission java.net.SocketPermission "*:1024-", "accept";
+
+  //
+  // Permiso para que el servicio dossierbox acepte peticiones de clientes.
+  //
+  permission javax.security.auth.kerberos.ServicePermission
+             "dossierbox@LABOPROGSEGURA.UNAVARRA.ES",
+             "accept";
+
+};

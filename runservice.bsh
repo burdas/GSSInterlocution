@@ -1,0 +1,7 @@
+#!/bin/bash
+
+java \
+-Djava.security.manager -Djava.security.policy=./etc/service.policy \
+-Djava.security.auth.login.config=./etc/serviceLogin.config \
+-Djava.security.krb5.realm=LABOPROGSEGURA.UNAVARRA.ES -Djava.security.krb5.kdc=172.18.73.113 \
+-cp ./dist/dossierbox.jar service.ServiceLogin 3200 10

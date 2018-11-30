@@ -1,0 +1,51 @@
+keystore "FILE:${user.dir}/keystores/sckeystore";
+keystorePasswordURL "FILE:${user.dir}/keystores/sckeystorepasswd";
+
+//
+// Cláusula con permisos necesarios para código de la clase ClientLogin 
+//
+grant /* codeBase "FILE:${user.dir}/dist/client.jar" */ {
+
+  permission javax.security.auth.AuthPermission "createLoginContext.Client";
+  permission javax.security.auth.AuthPermission "doAsPrivileged";
+
+  //
+  // Permisos necesarios para introducir confidencialmente
+  // una contraseña por consola (TextCallbackHandler lanza
+  // una excepción de control de acceso sin estos permisos)
+  //
+  permission java.lang.RuntimePermission "writeFileDescriptor";
+  permission java.lang.RuntimePermission "readFileDescriptor";
+
+};
+
+//
+// Cláusula con permisos necesarios para el código a ejecutar
+// por un cliente autenticado (clase ClientTask), asignados
+// a un principal concreto.
+//
+grant /* codeBase "FILE:${user.dir}/dist/client.jar", */
+      Principal javax.security.auth.kerberos.KerberosPrincipal 
+                "aldaz@LABOPROGSEGURA.UNAVARRA.ES" {
+  //
+  // Permiso para solicitar conexiones por el puerto 3200.
+  //
+  permission java.net.SocketPermission "localhost:3200", "connect";
+
+  //
+  // Permiso para poder interactuar con la componente TGT del servicio Kerberos.
+  // La componente TGT expide los tiques de servicio para poder acceder
+  // a los servicios de la red protegida con Kerberos.
+  //
+  permission javax.security.auth.kerberos.ServicePermission
+             "krbtgt/LABOPROGSEGURA.UNAVARRA.ES@LABOPROGSEGURA.UNAVARRA.ES", 
+             "initiate";
+
+  //
+  // Permiso para poder iniciar la interacción con el servicio de dossierbox.
+  //
+  permission javax.security.auth.kerberos.ServicePermission
+             "dossierbox@LABOPROGSEGURA.UNAVARRA.ES", 
+             "initiate";
+
+};
